@@ -4,7 +4,7 @@ from torchvision import models, transforms
 from PIL import Image
 import os
 import gdown
-
+import numpy as np
 # ---------------------------
 # Konfigurasi Halaman
 # ---------------------------
