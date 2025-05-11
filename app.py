@@ -179,14 +179,38 @@ elif mode == "📸 Deteksi Gambar":
 elif mode == "ℹ️ Tentang":
     st.subheader("Tentang Aplikasi")
     st.markdown("""
-    **Certan** adalah aplikasi deteksi penyakit ayam berbasis gambar kotoran menggunakan **Deep Learning** (ResNet-50) dan **Streamlit**.
+**Certan** adalah aplikasi deteksi penyakit ayam berbasis gambar kotoran menggunakan **Deep Learning** (ResNet-50) dan **Streamlit**.
 
-    **Fitur:**
-    - Deteksi otomatis penyakit: Coccidiosis, Salmonella, Newcastle, Healthy
-    - Input gambar via upload atau kamera
-    - Real-time prediction menggunakan model terlatih
+---
 
-    **Pengembang:** Kelompok 19 - D3 Teknologi Informasi
+### 🧠 Tentang Model
+- **Arsitektur**: ResNet-50
+- **Dataset**: Kumpulan gambar kotoran ayam dari berbagai sumber daring & laboratorium lokal
+- **Jumlah Data**: ±4.000 gambar (terdistribusi seimbang di 4 kelas)
+- **Augmentasi**: Rotasi, flipping horizontal/vertikal, brightness shift
+- **Optimasi**: Adam optimizer, learning rate 1e-4, batch size 32
+- **Epoch Training**: 25
+- **Akurasi Validasi**: ~91.3%
 
-    **Catatan:** Aplikasi ini bersifat edukatif dan bukan pengganti diagnosis dokter hewan profesional.
-    """)
+---
+
+### 📂 Sumber Dataset
+Dataset dikumpulkan dan dibersihkan dari:
+- Kaggle & publikasi terbuka (Coccidiosis, Salmonella)
+- Hasil dokumentasi lab peternakan lokal
+- Dataset tambahan melalui crowdsourcing dari peternak mitra
+
+---
+
+### ⚠️ Catatan
+Aplikasi ini bersifat **edukatif** dan **bukan** pengganti diagnosis dokter hewan profesional.
+
+---
+
+### 👨‍💻 Pengembang
+**Kelompok 19 - D3 Teknologi Informasi**
+- Aplikasi dibangun sebagai bagian dari proyek akhir semester.
+
+📫 Untuk pertanyaan atau kolaborasi: [email@example.com]
+""")
+
