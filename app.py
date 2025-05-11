@@ -116,36 +116,45 @@ def tampilkan_hasil(image):
         st.error(f"Gagal memuat gambar: {e}")
 
 # ---------------------------
-# Halaman Beranda
+# Halaman Beranda (Rebranding)
 # ---------------------------
 if mode == "🏠 Beranda":
-    st.title("Certan 🐔")
+    st.title("🐔 Certan")
     st.markdown("""
-    Selamat datang di **Certan**, aplikasi pintar untuk deteksi dini penyakit ayam berbasis gambar kotoran! 🧪🐓
+    ### Chicken Excreta Recognition & Analysis Tool
+    _"Deteksi Dini, Produksi Terjaga"_ 🧪
 
-    Dengan teknologi **Deep Learning (ResNet-50)**, Certan membantu peternak dan pemerhati unggas mengenali 4 kondisi:
+    ---
+    
+    Selamat datang di **Certan**, aplikasi cerdas berbasis kecerdasan buatan (AI) untuk mendeteksi penyakit ayam dari gambar kotoran. 🚀
 
-    - ⚠️ *Coccidiosis*
-    - ⚠️ *Salmonella*
-    - ⚠️ *Newcastle Disease*
-    - ✅ *Kondisi Sehat*
+    Dengan teknologi **Deep Learning (ResNet-50)**, Certan mampu mengklasifikasikan gambar ke dalam 4 kondisi:
+    
+    - 🦠 **Coccidiosis**
+    - 🧫 **Salmonella**
+    - 🦠 **Newcastle Disease**
+    - ✅ **Sehat**
 
-    **Kenapa Penting?**
-    - Deteksi dini = pencegahan penyebaran
-    - Hemat biaya pengobatan
-    - Meningkatkan produktivitas ternak
+    ---
+    ### Kenapa Penting?
+    - 🔍 Deteksi dini = Pencegahan cepat
+    - 💸 Menghemat biaya pengobatan
+    - 📈 Meningkatkan produktivitas ternak
 
-    **Fitur Aplikasi:**
-    - Deteksi otomatis dari gambar 📸
-    - Info lengkap tentang penyakit 🧬
-    - Input dari kamera langsung atau upload gambar 🖼️
+    ---
+    ### Fitur Aplikasi:
+    - 📸 Deteksi otomatis dari gambar
+    - 📚 Info lengkap tentang penyakit
+    - 📷 Input gambar dari kamera atau galeri
 
-    **Gunakan aplikasi ini untuk:**
+    ---
+    **Gunakan Certan untuk:**
     - Skrining cepat sebelum konsultasi dokter hewan
-    - Edukasi peternak atau mahasiswa peternakan
-    - Penelitian di bidang kesehatan hewan
-    """)
+    - Edukasi peternak dan mahasiswa
+    - Riset dan pengembangan peternakan digital
 
+    ---
+    """)
 # ---------------------------
 # Halaman Deteksi Gambar
 # ---------------------------
