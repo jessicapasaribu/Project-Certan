@@ -129,15 +129,12 @@ elif mode == "📸 Deteksi Gambar":
         if uploaded_file:
             try:
                 image = Image.open(uploaded_file)
-                image = image.convert("RGB")
-            except Exception as e:
-                st.error(f"Gagal memproses gambar: {e}")
-                st.stop()
-
-            st.image(image, caption="Gambar yang Diunggah", width=300)
-            label, info = predict(image, model)
-            st.success(f"✅ Prediksi: {label}")
-            st.info(info)
+                image = image.convert("RGB")  # pastikan RGB
+                st.image(image, caption="Gambar yang Diunggah", width=300)
+                st.write(f"Mode gambar: {image.mode}, Ukuran: {image.size}")
+                label, info = predict(image, model)
+                st.success(f"✅ Prediksi: {label}")
+                st.info(info)
 
             st.markdown(f"""
             ### 🔬 Ringkasan Deteksi
@@ -162,14 +159,14 @@ elif mode == "📸 Deteksi Gambar":
             try:
                 image = Image.open(camera_image)
                 image = image.convert("RGB")
+                st.image(image, caption="Gambar dari Kamera", width=300)
+                st.write(f"Mode gambar: {image.mode}, Ukuran: {image.size}")
+                label, info = predict(image, model)
+                st.success(f"✅ Prediksi: {label}")
+                st.info(info)
             except Exception as e:
-                st.error(f"Gagal memproses gambar kamera: {e}")
+                st.error(f"Gagal membuka gambar kamera: {e}")
                 st.stop()
-
-            st.image(image, caption="Gambar dari Kamera", width=300)
-            label, info = predict(image, model)
-            st.success(f"✅ Prediksi: {label}")
-            st.info(info)
 
             st.markdown(f"""
             ### 🔬 Ringkasan Deteksi
