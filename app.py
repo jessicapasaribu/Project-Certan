@@ -1,75 +1,79 @@
 import streamlit as st
 import torch
-from torchvision import transforms
+import torchvision.transforms as transforms
 from PIL import Image
+import urllib.request
+import os
 
-# Load model (disimpan dengan torch.save(model, ...))
-@st.cache_resource
-def load_model():
-    model = torch.load("Model-Certan-true.pt", map_location=torch.device("cpu"))
-    model.eval()
-    return model
+# --- Download model dari Google Drive jika belum ada ---
+MODEL_URL = "https://drive.google.com/uc?export=download&id=1CX-jCa3Tz9LimSq729DLKVS97RwEXPwv"
+MODEL_PATH = "Model-Certan-true.pt"
 
-model = load_model()
+if not os.path.exists(MODEL_PATH):
+    with st.spinner("📥 Mengunduh model..."):
+        urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+        st.success("✅ Model berhasil diunduh!")
 
-# Label prediksi sesuai urutan folder training
-label_dict = {
-    0: "Coccidiosis",
-    1: "Healthy",
-    2: "Newcastle Disease (ND)",
-    3: "Salmonella"
-}
+# --- Load Model ---
+model = torch.load(MODEL_PATH, map_location=torch.device('cpu'))
+model.eval()
 
+# --- Kelas ---
+classes = ['Chicken_Coccidiosis', 'Chicken_Healthy', 'Chicken_NewCastleDisease', 'Chicken_Salmonella']
 
-
-# Transformasi sesuai pelatihan
+# --- Transformasi Gambar ---
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
-    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
+
+# --- Deskripsi Penyakit ---
+penjelasan = {
+    "Chicken_Coccidiosis": "🔴 Penyakit parasit yang menyerang usus ayam. Gejala: diare berdarah, lesu, dan penurunan berat badan.",
+    "Chicken_Healthy": "🟢 Tidak terdeteksi penyakit. Ayam kemungkinan dalam kondisi sehat.",
+    "Chicken_NewCastleDisease": "🟡 Penyakit virus yang sangat menular. Gejala: sesak napas, leher terpuntir, dan kematian mendadak.",
+    "Chicken_Salmonella": "🟠 Infeksi bakteri yang menyebabkan diare, kehilangan nafsu makan, dan bisa menular ke manusia.",
+}
+
+# --- Judul ---
+st.title("🐔 Deteksi Penyakit Ayam dari Gambar Kotoran")
 st.markdown("""
-### 🐔 Tentang Aplikasi
-Aplikasi ini menggunakan model deep learning berbasis ResNet-50 untuk mendeteksi **penyakit ayam** melalui gambar kotoran.  
-Cukup upload atau ambil gambar kotoran ayam, dan sistem akan memprediksi kemungkinan penyakit yang diderita ayam berdasarkan citra.
+Aplikasi ini mendeteksi penyakit pada ayam berdasarkan **gambar kotoran** menggunakan model deep learning ResNet-50.
 
-Model mengenali 4 kelas:
-- **Coccidiosis**
-- **Salmonella**
-- **Newcastle Disease (ND)**
-- **Healthy**
-
-🧠 Teknologi yang digunakan: PyTorch, ResNet-50, Streamlit
+Silakan unggah atau ambil gambar untuk mendeteksi:
+- Coccidiosis
+- Salmonella
+- Newcastle Disease
+- Kondisi Sehat
 """)
 
+# --- Input Gambar ---
+option = st.radio("Pilih metode input:", ["📸 Ambil Gambar", "🖼️ Upload Gambar"])
 
-# Fungsi prediksi
-def predict(image):
-    image = image.convert("RGB")
-    input_tensor = transform(image).unsqueeze(0)  # [1, 3, 224, 224]
+image = None
+if option == "📸 Ambil Gambar":
+    image = st.camera_input("Ambil gambar kotoran ayam")
+else:
+    image = st.file_uploader("Unggah gambar kotoran ayam", type=["jpg", "jpeg", "png"])
+
+# --- Prediksi ---
+if image:
+    img = Image.open(image).convert('RGB')
+    st.image(img, caption="Gambar yang dimasukkan", use_column_width=True)
+
+    input_tensor = transform(img).unsqueeze(0)
     with torch.no_grad():
         output = model(input_tensor)
-        pred_idx = torch.argmax(output, dim=1).item()
-    return label_dict.get(pred_idx, "Tidak diketahui")
+        _, predicted = torch.max(output, 1)
+        label = classes[predicted.item()]
 
-# Tampilan Streamlit
-st.title("Prediksi Penyakit Ayam dari Gambar Kotoran")
-st.write("Gunakan foto kotoran ayam untuk memprediksi kemungkinan penyakit.")
+    st.success(f"📌 **Hasil Prediksi: {label}**")
+    st.info(penjelasan.get(label, "Tidak ada penjelasan tersedia."))
 
-input_method = st.radio("Pilih metode input:", ["Upload Gambar", "Ambil dari Kamera"])
-
-if input_method == "Upload Gambar":
-    uploaded_file = st.file_uploader("Upload gambar", type=["jpg", "jpeg", "png"])
-    if uploaded_file is not None:
-        image = Image.open(uploaded_file)
-        st.image(image, caption="Gambar yang diupload", use_column_width=True)
-        pred = predict(image)
-        st.success(f"Hasil Prediksi: **{pred}**")
-
-elif input_method == "Ambil dari Kamera":
-    camera_image = st.camera_input("Ambil gambar dari kamera")
-    if camera_image is not None:
-        image = Image.open(camera_image)
-        st.image(image, caption="Gambar dari kamera", use_column_width=True)
-        pred = predict(image)
-        st.success(f"Hasil Prediksi: **{pred}**")
+# --- Footer ---
+st.markdown("""
+---
+🧪 Model: ResNet-50, dilatih untuk klasifikasi kotoran ayam  
+📦 Framework: PyTorch + Streamlit  
+👨‍💻 Oleh: [Nama Kamu]
+""")
