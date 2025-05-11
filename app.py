@@ -127,7 +127,13 @@ elif mode == "📸 Deteksi Gambar":
     if pilihan == "Unggah Gambar":
         uploaded_file = st.file_uploader("Unggah gambar", type=["jpg", "jpeg", "png"])
         if uploaded_file:
-            image = Image.open(uploaded_file).convert("RGB")
+            try:
+                image = Image.open(uploaded_file)
+                image = image.convert("RGB")
+            except Exception as e:
+                st.error(f"Gagal memproses gambar: {e}")
+                st.stop()
+
             st.image(image, caption="Gambar yang Diunggah", width=300)
             label, info = predict(image, model)
             st.success(f"✅ Prediksi: {label}")
@@ -153,7 +159,13 @@ elif mode == "📸 Deteksi Gambar":
     elif pilihan == "Ambil dari Kamera":
         camera_image = st.camera_input("Ambil gambar langsung")
         if camera_image:
-            image = Image.open(camera_image).convert("RGB")
+            try:
+                image = Image.open(camera_image)
+                image = image.convert("RGB")
+            except Exception as e:
+                st.error(f"Gagal memproses gambar kamera: {e}")
+                st.stop()
+
             st.image(image, caption="Gambar dari Kamera", width=300)
             label, info = predict(image, model)
             st.success(f"✅ Prediksi: {label}")
