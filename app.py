@@ -53,15 +53,16 @@ risk = {
 # ---------------------------
 # Load Model (dengan state_dict)
 # ---------------------------
-MODEL_URL = "https://drive.google.com/uc?export=download&id=1-FobzoF_xu7OT3shK0UeQzQOp-BjDLPX"
-MODEL_PATH = "Model-Certan-true-state.pt"
+import gdown
+
+MODEL_ID = "1-FobzoF_xu7OT3shK0UeQzQOp-BjDLPX"
+MODEL_PATH = "model_state_dict.pt"
 
 @st.cache_resource
 def load_model():
     if not os.path.exists(MODEL_PATH):
-        with st.spinner("Mengunduh model dari Google Drive..."):
-            file_id = "1-FobzoF_xu7OT3shK0UeQzQOp-BjDLPX"
-            url = f"https://drive.google.com/uc?id={file_id}"
+        with st.spinner("📥 Mengunduh model dari Google Drive..."):
+            url = f"https://drive.google.com/uc?id={MODEL_ID}"
             gdown.download(url, MODEL_PATH, quiet=False)
             st.success("✅ Model berhasil diunduh!")
 
