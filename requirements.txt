@@ -2,7 +2,7 @@ streamlit
 torch==2.2.0+cpu
 torchvision==0.17.0+cpu
 Pillow
-numpy
+numpy==1.26.4
 gdown
 
 --extra-index-url https://download.pytorch.org/whl/cpu
