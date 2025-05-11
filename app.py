@@ -2,20 +2,16 @@ import streamlit as st
 import torch
 from torchvision import models, transforms
 from PIL import Image
-import numpy as np  # WAJIB: untuk konversi gambar
+import numpy as np
 import os
 import gdown
 
-# ---------------------------
-# Konfigurasi Halaman
-# ---------------------------
-st.set_page_config(page_title="Certan - Deteksi Penyakit Ayam", layout="centered")
+st.set_page_config(page_title="Certan - Deteksi Penyakit Ayam", layout="wide")
 
 # ---------------------------
-# Sidebar Navigasi
+# Tabs Navigasi (Gantikan Sidebar)
 # ---------------------------
-st.sidebar.title("Navigasi")
-mode = st.sidebar.radio("Pilih Mode", ["🏠 Beranda", "📸 Deteksi Gambar", "ℹ️ Tentang"])
+tab1, tab2, tab3 = st.tabs(["🏠 Beranda", "📸 Deteksi Gambar", "ℹ️ Tentang"])
 
 # ---------------------------
 # Fungsi Preprocessing Gambar
@@ -27,7 +23,7 @@ preprocess = transforms.Compose([
 ])
 
 # ---------------------------
-# Kelas Label dan Informasi
+# Label dan Informasi
 # ---------------------------
 class_names = [
     "Chicken_Coccidiosis",
@@ -37,33 +33,21 @@ class_names = [
 ]
 
 class_descriptions = {
-    "Chicken_Coccidiosis": "⚠️ Coccidiosis adalah penyakit parasit usus yang disebabkan oleh protozoa. Biasanya ditandai dengan diare berdarah dan penurunan berat badan.",
-    "Chicken_Healthy": "✅ Ayam dalam kondisi sehat. Tidak ditemukan gejala penyakit dalam gambar kotoran yang diberikan.",
-    "Chicken_NewCastleDisease": "⚠️ Newcastle Disease adalah infeksi virus yang sangat menular. Dapat menyebabkan gejala pernapasan, pencernaan, dan saraf.",
-    "Chicken_Salmonella": "⚠️ Salmonella adalah infeksi bakteri yang dapat menyebar melalui makanan atau air yang terkontaminasi, menyebabkan diare dan masalah pencernaan."
+    "Chicken_Coccidiosis": "⚠️ Coccidiosis adalah penyakit parasit usus yang disebabkan oleh protozoa.",
+    "Chicken_Healthy": "✅ Ayam dalam kondisi sehat.",
+    "Chicken_NewCastleDisease": "⚠️ Newcastle Disease adalah infeksi virus yang sangat menular.",
+    "Chicken_Salmonella": "⚠️ Salmonella adalah infeksi bakteri yang dapat menyebar melalui makanan atau air."
 }
-
-risk = {
-    "Chicken_Healthy": "🟢 Sangat Rendah",
-    "Chicken_Coccidiosis": "🔴 Tinggi",
-    "Chicken_Salmonella": "🟠 Sedang",
-    "Chicken_NewCastleDisease": "🔴 Sangat Tinggi"
-}
-
-# ---------------------------
-# Load Model (dengan state_dict)
-# ---------------------------
-MODEL_ID = "1-FobzoF_xu7OT3shK0UeQzQOp-BjDLPX"
-MODEL_PATH = "model_state_dict.pt"
 
 @st.cache_resource
 def load_model():
+    MODEL_ID = "1-FobzoF_xu7OT3shK0UeQzQOp-BjDLPX"
+    MODEL_PATH = "model_state_dict.pt"
     if not os.path.exists(MODEL_PATH):
-        with st.spinner("📥 Mengunduh model dari Google Drive..."):
+        with st.spinner("📥 Mengunduh model..."):
             url = f"https://drive.google.com/uc?id={MODEL_ID}"
             gdown.download(url, MODEL_PATH, quiet=False)
             st.success("✅ Model berhasil diunduh!")
-
     model = models.resnet50()
     num_ftrs = model.fc.in_features
     model.fc = torch.nn.Linear(num_ftrs, len(class_names))
@@ -73,9 +57,6 @@ def load_model():
 
 model = load_model()
 
-# ---------------------------
-# Fungsi Prediksi
-# ---------------------------
 def predict(image, model):
     img_tensor = preprocess(image).unsqueeze(0)
     with torch.no_grad():
@@ -84,106 +65,52 @@ def predict(image, model):
         label = class_names[predicted.item()]
         return label, class_descriptions[label]
 
-# ---------------------------
-# Fungsi Tampilkan Hasil Deteksi (diperbarui)
-# ---------------------------
 def tampilkan_hasil(image):
     st.image(image, caption="Gambar yang Diproses", width=300)
-    st.write(f"Mode gambar: {image.mode}, Ukuran: {image.size}")
-
     try:
         label, _ = predict(image, model)
-
         st.success(f"✅ Prediksi: {label.replace('_', ' ')}")
-        
-        # Informasi mendalam berdasarkan label
+
         if label == "Chicken_Coccidiosis":
-            st.markdown("""
-            ### 🦠 Coccidiosis
-            Coccidiosis adalah infeksi usus serius yang disebabkan oleh protozoa *Eimeria*. Penyakit ini umum terjadi pada ayam muda dan bisa menyebabkan kematian jika tidak segera ditangani.
-
-            **Gejala Umum:**
-            - Diare berdarah
-            - Lesu dan kehilangan nafsu makan
-            - Penurunan berat badan
-            - Bulu kusam
-
-            **Pencegahan & Pengobatan:**
-            - Vaksinasi dan pemberian anticoccidial dalam pakan
-            - Jaga kebersihan kandang dan sanitasi air
-            - Hindari kepadatan populasi yang tinggi
-
-            📌 *Segera isolasi ayam yang terinfeksi dan konsultasikan dengan dokter hewan.*
+            st.markdown("""### 🦠 Coccidiosis
+            Infeksi usus oleh protozoa *Eimeria*. Bisa menyebabkan kematian.
+            **Gejala:** diare berdarah, lesu, penurunan berat badan.
+            **Solusi:** vaksin, sanitasi ketat, pemisahan ayam terinfeksi.
             """)
 
         elif label == "Chicken_Salmonella":
-            st.markdown("""
-            ### 🧫 Salmonella
-            Salmonellosis adalah infeksi bakteri dari genus *Salmonella*, umumnya menyebar melalui makanan, air, atau peralatan yang terkontaminasi.
-
-            **Gejala Umum:**
-            - Diare dan kotoran berair
-            - Nafsu makan menurun
-            - Penurunan produksi telur
-            - Kematian mendadak pada anak ayam
-
-            **Pencegahan & Pengobatan:**
-            - Gunakan vaksin dan biosekuriti yang ketat
-            - Pisahkan ayam yang terinfeksi
-            - Bersihkan kandang secara rutin
-
-            ⚠️ *Beberapa jenis Salmonella bisa menular ke manusia (zoonosis), penting untuk penanganan higienis.*
+            st.markdown("""### 🧫 Salmonella
+            Infeksi bakteri dari makanan/air kotor.
+            **Gejala:** diare, nafsu makan menurun, kematian anak ayam.
+            **Solusi:** vaksinasi, sanitasi, isolasi ayam sakit.
             """)
 
         elif label == "Chicken_NewCastleDisease":
-            st.markdown("""
-            ### 🦠 Newcastle Disease
-            Newcastle Disease (ND) adalah penyakit virus yang sangat menular dan mematikan, menyerang saluran pernapasan, sistem saraf, dan pencernaan ayam.
-
-            **Gejala Umum:**
-            - Bersin, batuk, dan sesak napas
-            - Leher melintir atau lumpuh (gejala neurologis)
-            - Penurunan produksi telur drastis
-            - Kematian mendadak
-
-            **Pencegahan & Pengobatan:**
-            - Vaksinasi ND secara berkala
-            - Pengawasan lalu lintas unggas
-            - Isolasi dan pemusnahan ayam terinfeksi (jika perlu)
-
-            🔥 *ND adalah penyakit yang wajib dilaporkan di banyak negara karena tingkat penyebarannya yang ekstrem.*
+            st.markdown("""### 🦠 Newcastle Disease
+            Virus mematikan yang menyerang sistem saraf dan pernapasan.
+            **Gejala:** batuk, lumpuh, kematian mendadak.
+            **Solusi:** vaksinasi rutin, biosekuriti ketat.
             """)
 
         elif label == "Chicken_Healthy":
-            st.markdown("""
-            ### ✅ Ayam Sehat
-            Gambar kotoran ayam menunjukkan tidak adanya indikasi penyakit utama seperti Coccidiosis, Salmonella, atau Newcastle Disease.
-
-            **Rekomendasi:**
-            - Pertahankan pola makan seimbang
-            - Jaga kebersihan kandang setiap hari
-            - Lakukan vaksinasi dan biosekuriti sesuai jadwal
-
-            🎉 *Tidak ditemukan kelainan – kondisi normal.*
+            st.markdown("""### ✅ Ayam Sehat
+            Gambar tidak menunjukkan tanda penyakit.
+            **Saran:** pertahankan pola makan, kebersihan, dan vaksinasi.
             """)
-
     except Exception as e:
-        st.error(f"Gagal melakukan prediksi: {e}")
+        st.error(f"❌ Gagal melakukan prediksi: {e}")
 
 # ---------------------------
-# Halaman Beranda (Rebranding)
+# Halaman Tab 1 - Beranda
 # ---------------------------
-if mode == "🏠 Beranda":
+with tab1:
     st.title("🐔 Certan")
     st.markdown("""
     ### Chicken Excreta Recognition & Analysis Tool
     _"Deteksi Dini, Produksi Terjaga"_ 🧪
 
     ---
-    
-    Selamat datang di **Certan**, aplikasi cerdas berbasis kecerdasan buatan (AI) untuk mendeteksi penyakit ayam dari gambar kotoran. 🚀
-
-    Dengan teknologi **Deep Learning (ResNet-50)**, Certan mampu mengklasifikasikan gambar ke dalam 4 kondisi:
+    Certan adalah aplikasi AI untuk mendeteksi penyakit ayam dari gambar kotoran. Menggunakan **ResNet-50**, Certan mengklasifikasikan gambar ke dalam:
     
     - 🦠 **Coccidiosis**
     - 🧫 **Salmonella**
@@ -191,29 +118,18 @@ if mode == "🏠 Beranda":
     - ✅ **Sehat**
 
     ---
-    ### Kenapa Penting?
-    - 🔍 Deteksi dini = Pencegahan cepat
-    - 💸 Menghemat biaya pengobatan
-    - 📈 Meningkatkan produktivitas ternak
-
-    ---
-    ### Fitur Aplikasi:
-    - 📸 Deteksi otomatis dari gambar
-    - 📚 Info lengkap tentang penyakit
-    - 📷 Input gambar dari kamera atau galeri
-
-    ---
-    **Gunakan Certan untuk:**
-    - Skrining cepat sebelum konsultasi dokter hewan
-    - Edukasi peternak dan mahasiswa
-    - Riset dan pengembangan peternakan digital
+    **Manfaat:**
+    - 🔍 Deteksi dini
+    - 💸 Hemat biaya pengobatan
+    - 📈 Tingkatkan produktivitas ternak
 
     ---
     """)
+
 # ---------------------------
-# Halaman Deteksi Gambar
+# Halaman Tab 2 - Deteksi
 # ---------------------------
-elif mode == "📸 Deteksi Gambar":
+with tab2:
     st.header("📸 Deteksi Penyakit Ayam dari Gambar Kotoran")
     pilihan = st.radio("Pilih Metode Input Gambar", ["Unggah Gambar", "Ambil dari Kamera"])
 
@@ -225,7 +141,6 @@ elif mode == "📸 Deteksi Gambar":
                 tampilkan_hasil(image)
             except Exception as e:
                 st.error(f"Gagal memuat gambar: {e}")
-                st.stop()
 
     elif pilihan == "Ambil dari Kamera":
         camera_image = st.camera_input("Ambil gambar langsung")
@@ -235,45 +150,31 @@ elif mode == "📸 Deteksi Gambar":
                 tampilkan_hasil(image)
             except Exception as e:
                 st.error(f"Gagal membuka gambar kamera: {e}")
-                st.stop()
 
-elif mode == "ℹ️ Tentang":
+# ---------------------------
+# Halaman Tab 3 - Tentang
+# ---------------------------
+with tab3:
     st.subheader("Tentang Certan 🐔")
     st.markdown("""
-    **Certan** (*Chicken Excreta Recognition & Analysis Tool*) adalah aplikasi berbasis AI yang dirancang untuk membantu deteksi dini penyakit ayam melalui analisis gambar kotoran. Dengan teknologi visi komputer, Certan memberikan hasil cepat dan informasi penting seputar kesehatan unggas.
+    **Certan** adalah aplikasi AI untuk deteksi penyakit ayam lewat gambar kotoran.
 
-    ---
-    ### 🎯 Tujuan Aplikasi
-    - Membantu peternak mendeteksi penyakit lebih awal
-    - Menyediakan informasi edukatif tentang penyakit unggas
-    - Mendukung ketahanan pangan melalui kesehatan ternak
+    ### 🎯 Tujuan:
+    - Deteksi penyakit secara cepat & praktis
+    - Bantu edukasi peternak & mahasiswa
+    - Dukung kesehatan unggas nasional
 
-    ---
-    ### 🧠 Teknologi yang Digunakan
-    - **Model AI**: ResNet-50
-    - **Klasifikasi**: 4 Kategori (Sehat, Coccidiosis, Salmonella, Newcastle Disease)
-    - **Input**: Gambar kotoran ayam dari kamera atau unggahan
-    - **Proses**: Gambar diproses dan diklasifikasikan dalam hitungan detik
-
-    ---
-    ### 📚 Tentang Dataset
-    - Sumber data dari publikasi daring & mitra peternakan lokal
-    - Total ±4.000 gambar dilatih dengan augmentasi (rotasi, flip, brightness)
+    ### 🧠 Teknologi:
+    - Deep Learning (ResNet-50)
+    - Dataset ±4000 gambar dilatih dengan augmentasi
     - Akurasi validasi model: ±91%
 
-    ---
-    ### 👨‍💻 Pengembang
-    Proyek ini dikembangkan oleh:
-    **Kelompok 19 - D3 Teknologi Informasi**
+    ### 👩‍💻 Pengembang:
+    Kelompok 19 - D3 Teknologi Informasi  
+    - Jessi Pasaribu  
+    - [Nama lainnya jika ada]
 
-    - Jessi Pasaribu
-    - [Nama Anggota Lainnya jika ada]
+    📫 Kontak: [email@example.com]
 
-    📫 Untuk pertanyaan atau kolaborasi: [email@example.com]
-
-    ---
-    ### ⚠️ Disclaimer
-    Certan tidak dimaksudkan sebagai alat diagnosis medis resmi. Untuk hasil diagnosis yang akurat, silakan konsultasikan ke dokter hewan profesional.
+    ⚠️ *Disclaimer: ini bukan alat diagnosis medis resmi. Konsultasikan ke dokter hewan untuk diagnosis akurat.*
     """)
-
-
