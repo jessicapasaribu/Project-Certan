@@ -2,9 +2,8 @@ import streamlit as st
 import torch
 from torchvision import models, transforms
 from PIL import Image
-import io
 import os
-import urllib.request
+import gdown
 
 # ---------------------------
 # Konfigurasi Halaman
@@ -53,8 +52,6 @@ risk = {
 # ---------------------------
 # Load Model (dengan state_dict)
 # ---------------------------
-import gdown
-
 MODEL_ID = "1-FobzoF_xu7OT3shK0UeQzQOp-BjDLPX"
 MODEL_PATH = "model_state_dict.pt"
 
@@ -67,8 +64,7 @@ def load_model():
             st.success("✅ Model berhasil diunduh!")
 
     model = models.resnet50()
-    num_ftrs = model.fc.in_features
-    model.fc = torch.nn.Linear(num_ftrs, len(class_names))
+    model.fc = torch.nn.Linear(model.fc.in_features, len(class_names))
     model.load_state_dict(torch.load(MODEL_PATH, map_location=torch.device('cpu')))
     model.eval()
     return model
@@ -124,69 +120,48 @@ elif mode == "📸 Deteksi Gambar":
 
     model = load_model()
 
+    def tampilkan_hasil(image):
+        image = image.convert("RGB")
+        st.image(image, caption="Gambar yang Diberikan", width=300)
+        st.write(f"Mode gambar: {image.mode}, Ukuran: {image.size}")
+        label, info = predict(image, model)
+        st.success(f"✅ Prediksi: {label.replace('_', ' ')}")
+        st.info(info)
+
+        st.markdown(f"""
+        ### 🔬 Ringkasan Deteksi
+        - **Jenis**: {label.replace('_', ' ')}
+        - **Risiko Penularan**: {risk.get(label, 'Tidak Diketahui')}
+        - **Saran**: {'Segera isolasi ayam dan konsultasikan ke dokter hewan.' if label != 'Chicken_Healthy' else 'Pertahankan kebersihan dan pakan yang baik.'}
+        """)
+
+        st.markdown("""
+        ---
+        ### 📌 Fakta Cepat
+        - Coccidiosis bisa membunuh ayam hanya dalam 2-3 hari bila tidak diobati.
+        - Newcastle Disease menyebar melalui udara dan sangat menular.
+        - Salmonella dapat menular ke manusia jika tidak ditangani dengan baik.
+
+        📖 **Sumber**: Direktorat Jenderal Peternakan dan Kesehatan Hewan, 2022
+        """)
+
     if pilihan == "Unggah Gambar":
         uploaded_file = st.file_uploader("Unggah gambar", type=["jpg", "jpeg", "png"])
         if uploaded_file:
             try:
                 image = Image.open(uploaded_file)
-                image = image.convert("RGB")  # pastikan RGB
-                st.image(image, caption="Gambar yang Diunggah", width=300)
-                st.write(f"Mode gambar: {image.mode}, Ukuran: {image.size}")
-                label, info = predict(image, model)
-                st.success(f"✅ Prediksi: {label}")
-                st.info(info)
+                tampilkan_hasil(image)
             except Exception as e:
                 st.error(f"Gagal memuat gambar: {e}")
-                st.stop()
-                
-            st.markdown(f"""
-            ### 🔬 Ringkasan Deteksi
-            - **Jenis**: {label.replace('_', ' ')}
-            - **Risiko Penularan**: {risk.get(label, 'Tidak Diketahui')}
-            - **Saran**: {'Segera isolasi ayam dan konsultasikan ke dokter hewan.' if label != 'Chicken_Healthy' else 'Pertahankan kebersihan dan pakan yang baik.'}
-            """)
-
-            st.markdown("""
-            ---
-            ### 📌 Fakta Cepat
-            - Coccidiosis bisa membunuh ayam hanya dalam 2-3 hari bila tidak diobati.
-            - Newcastle Disease menyebar melalui udara dan sangat menular.
-            - Salmonella dapat menular ke manusia jika tidak ditangani dengan baik.
-
-            📖 **Sumber**: Direktorat Jenderal Peternakan dan Kesehatan Hewan, 2022
-            """)
 
     elif pilihan == "Ambil dari Kamera":
         camera_image = st.camera_input("Ambil gambar langsung")
         if camera_image:
             try:
                 image = Image.open(camera_image)
-                image = image.convert("RGB")
-                st.image(image, caption="Gambar dari Kamera", width=300)
-                st.write(f"Mode gambar: {image.mode}, Ukuran: {image.size}")
-                label, info = predict(image, model)
-                st.success(f"✅ Prediksi: {label}")
-                st.info(info)
+                tampilkan_hasil(image)
             except Exception as e:
-                st.error(f"Gagal membuka gambar kamera: {e}")
-                st.stop()
-
-            st.markdown(f"""
-            ### 🔬 Ringkasan Deteksi
-            - **Jenis**: {label.replace('_', ' ')}
-            - **Risiko Penularan**: {risk.get(label, 'Tidak Diketahui')}
-            - **Saran**: {'Segera isolasi ayam dan konsultasikan ke dokter hewan.' if label != 'Chicken_Healthy' else 'Pertahankan kebersihan dan pakan yang baik.'}
-            """)
-
-            st.markdown("""
-            ---
-            ### 📌 Fakta Cepat
-            - Coccidiosis bisa membunuh ayam hanya dalam 2-3 hari bila tidak diobati.
-            - Newcastle Disease menyebar melalui udara dan sangat menular.
-            - Salmonella dapat menular ke manusia jika tidak ditangani dengan baik.
-
-            📖 **Sumber**: Direktorat Jenderal Peternakan dan Kesehatan Hewan, 2022
-            """)
+                st.error(f"Gagal membuka gambar dari kamera: {e}")
 
 # ---------------------------
 # Halaman Tentang
@@ -228,4 +203,3 @@ Aplikasi ini bersifat **edukatif** dan **bukan** pengganti diagnosis dokter hewa
 
 📫 Untuk pertanyaan atau kolaborasi: [email@example.com]
 """)
-
