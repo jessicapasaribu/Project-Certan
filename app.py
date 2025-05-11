@@ -237,43 +237,43 @@ elif mode == "📸 Deteksi Gambar":
                 st.error(f"Gagal membuka gambar kamera: {e}")
                 st.stop()
 
-# ---------------------------
-# Halaman Tentang
-# ---------------------------
 elif mode == "ℹ️ Tentang":
-    st.subheader("Tentang Aplikasi")
+    st.subheader("Tentang Certan 🐔")
     st.markdown("""
-**Certan** adalah aplikasi deteksi penyakit ayam berbasis gambar kotoran menggunakan **Deep Learning** (ResNet-50) dan **Streamlit**.
+    **Certan** (*Chicken Excreta Recognition & Analysis Tool*) adalah aplikasi berbasis AI yang dirancang untuk membantu deteksi dini penyakit ayam melalui analisis gambar kotoran. Dengan teknologi visi komputer, Certan memberikan hasil cepat dan informasi penting seputar kesehatan unggas.
 
----
+    ---
+    ### 🎯 Tujuan Aplikasi
+    - Membantu peternak mendeteksi penyakit lebih awal
+    - Menyediakan informasi edukatif tentang penyakit unggas
+    - Mendukung ketahanan pangan melalui kesehatan ternak
 
-### 🧠 Tentang Model
-- **Arsitektur**: ResNet-50
-- **Dataset**: Kumpulan gambar kotoran ayam dari berbagai sumber daring & laboratorium lokal
-- **Jumlah Data**: ±4.000 gambar (terdistribusi seimbang di 4 kelas)
-- **Augmentasi**: Rotasi, flipping horizontal/vertikal, brightness shift
-- **Optimasi**: Adam optimizer, learning rate 1e-4, batch size 32
-- **Epoch Training**: 25
-- **Akurasi Validasi**: ~91.3%
+    ---
+    ### 🧠 Teknologi yang Digunakan
+    - **Model AI**: ResNet-50
+    - **Klasifikasi**: 4 Kategori (Sehat, Coccidiosis, Salmonella, Newcastle Disease)
+    - **Input**: Gambar kotoran ayam dari kamera atau unggahan
+    - **Proses**: Gambar diproses dan diklasifikasikan dalam hitungan detik
 
----
+    ---
+    ### 📚 Tentang Dataset
+    - Sumber data dari publikasi daring & mitra peternakan lokal
+    - Total ±4.000 gambar dilatih dengan augmentasi (rotasi, flip, brightness)
+    - Akurasi validasi model: ±91%
 
-### 📂 Sumber Dataset
-Dataset dikumpulkan dan dibersihkan dari:
-- Kaggle & publikasi terbuka (Coccidiosis, Salmonella)
-- Hasil dokumentasi lab peternakan lokal
-- Dataset tambahan melalui crowdsourcing dari peternak mitra
+    ---
+    ### 👨‍💻 Pengembang
+    Proyek ini dikembangkan oleh:
+    **Kelompok 19 - D3 Teknologi Informasi**
 
----
+    - Jessi Pasaribu
+    - [Nama Anggota Lainnya jika ada]
 
-### ⚠️ Catatan
-Aplikasi ini bersifat **edukatif** dan **bukan** pengganti diagnosis dokter hewan profesional.
+    📫 Untuk pertanyaan atau kolaborasi: [email@example.com]
 
----
+    ---
+    ### ⚠️ Disclaimer
+    Certan tidak dimaksudkan sebagai alat diagnosis medis resmi. Untuk hasil diagnosis yang akurat, silakan konsultasikan ke dokter hewan profesional.
+    """)
 
-### 👨‍💻 Pengembang
-**Kelompok 19 - D3 Teknologi Informasi**
-- Aplikasi dibangun sebagai bagian dari proyek akhir semester.
 
-📫 Untuk pertanyaan atau kolaborasi: [email@example.com]
-""")
