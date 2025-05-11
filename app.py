@@ -85,35 +85,90 @@ def predict(image, model):
         return label, class_descriptions[label]
 
 # ---------------------------
-# Fungsi Tampilkan Hasil Deteksi
+# Fungsi Tampilkan Hasil Deteksi (diperbarui)
 # ---------------------------
 def tampilkan_hasil(image):
     st.image(image, caption="Gambar yang Diproses", width=300)
     st.write(f"Mode gambar: {image.mode}, Ukuran: {image.size}")
-    
+
     try:
-        label, info = predict(image, model)
+        label, _ = predict(image, model)
+
         st.success(f"✅ Prediksi: {label.replace('_', ' ')}")
-        st.info(info)
+        
+        # Informasi mendalam berdasarkan label
+        if label == "Chicken_Coccidiosis":
+            st.markdown("""
+            ### 🦠 Coccidiosis
+            Coccidiosis adalah infeksi usus serius yang disebabkan oleh protozoa *Eimeria*. Penyakit ini umum terjadi pada ayam muda dan bisa menyebabkan kematian jika tidak segera ditangani.
 
-        st.markdown(f"""
-        ### 🔬 Ringkasan Deteksi
-        - **Jenis**: {label.replace('_', ' ')}
-        - **Risiko Penularan**: {risk.get(label, 'Tidak Diketahui')}
-        - **Saran**: {'Segera isolasi ayam dan konsultasikan ke dokter hewan.' if label != 'Chicken_Healthy' else 'Pertahankan kebersihan dan pakan yang baik.'}
-        """)
+            **Gejala Umum:**
+            - Diare berdarah
+            - Lesu dan kehilangan nafsu makan
+            - Penurunan berat badan
+            - Bulu kusam
 
-        st.markdown("---")
-        st.markdown("""
-        ### 📌 Fakta Cepat
-        - Coccidiosis bisa membunuh ayam hanya dalam 2-3 hari bila tidak diobati.
-        - Newcastle Disease menyebar melalui udara dan sangat menular.
-        - Salmonella dapat menular ke manusia jika tidak ditangani dengan baik.
+            **Pencegahan & Pengobatan:**
+            - Vaksinasi dan pemberian anticoccidial dalam pakan
+            - Jaga kebersihan kandang dan sanitasi air
+            - Hindari kepadatan populasi yang tinggi
 
-        📖 **Sumber**: Direktorat Jenderal Peternakan dan Kesehatan Hewan, 2022
-        """)
+            📌 *Segera isolasi ayam yang terinfeksi dan konsultasikan dengan dokter hewan.*
+            """)
+
+        elif label == "Chicken_Salmonella":
+            st.markdown("""
+            ### 🧫 Salmonella
+            Salmonellosis adalah infeksi bakteri dari genus *Salmonella*, umumnya menyebar melalui makanan, air, atau peralatan yang terkontaminasi.
+
+            **Gejala Umum:**
+            - Diare dan kotoran berair
+            - Nafsu makan menurun
+            - Penurunan produksi telur
+            - Kematian mendadak pada anak ayam
+
+            **Pencegahan & Pengobatan:**
+            - Gunakan vaksin dan biosekuriti yang ketat
+            - Pisahkan ayam yang terinfeksi
+            - Bersihkan kandang secara rutin
+
+            ⚠️ *Beberapa jenis Salmonella bisa menular ke manusia (zoonosis), penting untuk penanganan higienis.*
+            """)
+
+        elif label == "Chicken_NewCastleDisease":
+            st.markdown("""
+            ### 🦠 Newcastle Disease
+            Newcastle Disease (ND) adalah penyakit virus yang sangat menular dan mematikan, menyerang saluran pernapasan, sistem saraf, dan pencernaan ayam.
+
+            **Gejala Umum:**
+            - Bersin, batuk, dan sesak napas
+            - Leher melintir atau lumpuh (gejala neurologis)
+            - Penurunan produksi telur drastis
+            - Kematian mendadak
+
+            **Pencegahan & Pengobatan:**
+            - Vaksinasi ND secara berkala
+            - Pengawasan lalu lintas unggas
+            - Isolasi dan pemusnahan ayam terinfeksi (jika perlu)
+
+            🔥 *ND adalah penyakit yang wajib dilaporkan di banyak negara karena tingkat penyebarannya yang ekstrem.*
+            """)
+
+        elif label == "Chicken_Healthy":
+            st.markdown("""
+            ### ✅ Ayam Sehat
+            Gambar kotoran ayam menunjukkan tidak adanya indikasi penyakit utama seperti Coccidiosis, Salmonella, atau Newcastle Disease.
+
+            **Rekomendasi:**
+            - Pertahankan pola makan seimbang
+            - Jaga kebersihan kandang setiap hari
+            - Lakukan vaksinasi dan biosekuriti sesuai jadwal
+
+            🎉 *Tidak ditemukan kelainan – kondisi normal.*
+            """)
+
     except Exception as e:
-        st.error(f"Gagal memuat gambar: {e}")
+        st.error(f"Gagal melakukan prediksi: {e}")
 
 # ---------------------------
 # Halaman Beranda (Rebranding)
