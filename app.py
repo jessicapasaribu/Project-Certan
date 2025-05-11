@@ -59,8 +59,10 @@ MODEL_PATH = "Model-Certan-true-state.pt"
 @st.cache_resource
 def load_model():
     if not os.path.exists(MODEL_PATH):
-        with st.spinner("📥 Mengunduh model dari Google Drive..."):
-            urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+        with st.spinner("Mengunduh model dari Google Drive..."):
+            file_id = "1-FobzoF_xu7OT3shK0UeQzQOp-BjDLPX"
+            url = f"https://drive.google.com/uc?id={file_id}"
+            gdown.download(url, MODEL_PATH, quiet=False)
             st.success("✅ Model berhasil diunduh!")
 
     model = models.resnet50()
