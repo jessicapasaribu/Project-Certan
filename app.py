@@ -2,9 +2,10 @@ import streamlit as st
 import torch
 from torchvision import models, transforms
 from PIL import Image
+import numpy as np  # WAJIB: untuk konversi gambar
 import os
 import gdown
-import numpy as np
+
 # ---------------------------
 # Konfigurasi Halaman
 # ---------------------------
@@ -90,27 +91,29 @@ def tampilkan_hasil(image):
     st.image(image, caption="Gambar yang Diproses", width=300)
     st.write(f"Mode gambar: {image.mode}, Ukuran: {image.size}")
     
-    label, info = predict(image, model)
-    
-    st.success(f"✅ Prediksi: {label.replace('_', ' ')}")
-    st.info(info)
+    try:
+        label, info = predict(image, model)
+        st.success(f"✅ Prediksi: {label.replace('_', ' ')}")
+        st.info(info)
 
-    st.markdown(f"""
-    ### 🔬 Ringkasan Deteksi
-    - **Jenis**: {label.replace('_', ' ')}
-    - **Risiko Penularan**: {risk.get(label, 'Tidak Diketahui')}
-    - **Saran**: {'Segera isolasi ayam dan konsultasikan ke dokter hewan.' if label != 'Chicken_Healthy' else 'Pertahankan kebersihan dan pakan yang baik.'}
-    """)
+        st.markdown(f"""
+        ### 🔬 Ringkasan Deteksi
+        - **Jenis**: {label.replace('_', ' ')}
+        - **Risiko Penularan**: {risk.get(label, 'Tidak Diketahui')}
+        - **Saran**: {'Segera isolasi ayam dan konsultasikan ke dokter hewan.' if label != 'Chicken_Healthy' else 'Pertahankan kebersihan dan pakan yang baik.'}
+        """)
 
-    st.markdown("---")
-    st.markdown("""
-    ### 📌 Fakta Cepat
-    - Coccidiosis bisa membunuh ayam hanya dalam 2-3 hari bila tidak diobati.
-    - Newcastle Disease menyebar melalui udara dan sangat menular.
-    - Salmonella dapat menular ke manusia jika tidak ditangani dengan baik.
+        st.markdown("---")
+        st.markdown("""
+        ### 📌 Fakta Cepat
+        - Coccidiosis bisa membunuh ayam hanya dalam 2-3 hari bila tidak diobati.
+        - Newcastle Disease menyebar melalui udara dan sangat menular.
+        - Salmonella dapat menular ke manusia jika tidak ditangani dengan baik.
 
-    📖 **Sumber**: Direktorat Jenderal Peternakan dan Kesehatan Hewan, 2022
-    """)
+        📖 **Sumber**: Direktorat Jenderal Peternakan dan Kesehatan Hewan, 2022
+        """)
+    except Exception as e:
+        st.error(f"Gagal memuat gambar: {e}")
 
 # ---------------------------
 # Halaman Beranda
