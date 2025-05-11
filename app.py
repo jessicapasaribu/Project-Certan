@@ -135,7 +135,10 @@ elif mode == "📸 Deteksi Gambar":
                 label, info = predict(image, model)
                 st.success(f"✅ Prediksi: {label}")
                 st.info(info)
-
+            except Exception as e:
+                st.error(f"Gagal memuat gambar: {e}")
+                st.stop()
+                
             st.markdown(f"""
             ### 🔬 Ringkasan Deteksi
             - **Jenis**: {label.replace('_', ' ')}
