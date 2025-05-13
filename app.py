@@ -12,10 +12,21 @@ import gdown
 st.set_page_config(page_title="Certan - Deteksi Penyakit Ayam", layout="centered")
 
 # ---------------------------
-# Sidebar Navigasi
+# Sembunyikan Sidebar
 # ---------------------------
-st.sidebar.title("Navigasi")
-mode = st.sidebar.radio("Pilih Mode", ["🏠 Beranda", "📸 Deteksi Gambar", "ℹ️ Tentang"])
+st.markdown("""
+    <style>
+        [data-testid="stSidebar"] {
+            display: none;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# ---------------------------
+# Navigasi Topbar
+# ---------------------------
+st.markdown("<h1 style='text-align: center;'>🐔 Certan</h1>", unsafe_allow_html=True)
+mode = st.radio(" ", ["🏠 Beranda", "📸 Deteksi Gambar", "ℹ️ Tentang"], horizontal=True)
 
 # ---------------------------
 # Fungsi Preprocessing Gambar
@@ -90,11 +101,9 @@ def tampilkan_hasil(image):
         if label == "Chicken_Coccidiosis":
             st.markdown("""
                 ## 🦠 Coccidiosis
-
                 Infeksi usus serius akibat protozoa *Eimeria*.
 
                 ---
-
                 ### 🧩 Gejala:
                 - 💩 Diare berdarah
                 - 💤 Lesu
@@ -110,11 +119,9 @@ def tampilkan_hasil(image):
         elif label == "Chicken_Salmonella":
             st.markdown("""
                 ## 🧫 Salmonella
-
                 Infeksi bakteri dari air/pakan terkontaminasi.
 
                 ---
-
                 ### 🧩 Gejala:
                 - 💩 Diare encer
                 - 🐣 Kematian anak ayam
@@ -129,11 +136,9 @@ def tampilkan_hasil(image):
         elif label == "Chicken_NewCastleDisease":
             st.markdown("""
                 ## 🦠 Newcastle Disease
-
                 Virus menular menyerang pernapasan, saraf & pencernaan.
 
                 ---
-
                 ### 🧩 Gejala:
                 - 😮‍💨 Batuk, sesak napas
                 - 🌀 Leher terpelintir
@@ -148,11 +153,9 @@ def tampilkan_hasil(image):
         elif label == "Chicken_Healthy":
             st.markdown("""
                 ## ✅ Ayam Sehat
-
                 Tidak ditemukan gejala penyakit utama.
 
                 ---
-
                 ### 🧩 Rekomendasi:
                 - 🍽️ Pola makan baik
                 - 🧼 Kandang bersih
@@ -166,7 +169,6 @@ def tampilkan_hasil(image):
 # Halaman Beranda
 # ---------------------------
 if mode == "🏠 Beranda":
-    st.title("🐔 Certan")
     st.markdown("""
     ### Chicken Excreta Recognition & Analysis Tool  
     _"Deteksi Dini, Produksi Terjaga"_ 🧪
@@ -248,10 +250,11 @@ elif mode == "ℹ️ Tentang":
     Proyek oleh:
     **Kelompok 19 - D3 Teknologi Informasi**
 
-    - Jessi Pasaribu
-    - [Anggota lainnya]
+    - Jessica Pasaribu
+    - Sarah Meilani Butar-Butar
+    - Samuel Albi Pulo
 
-    📫 Kontak: [email@example.com]
+    📫 Kontak: [kel19@gmail.com]
 
     ### ⚠️ Disclaimer
     Certan bukan alat diagnosis resmi. Untuk diagnosis pasti, konsultasikan dengan dokter hewan.
