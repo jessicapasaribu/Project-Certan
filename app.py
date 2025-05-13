@@ -241,11 +241,6 @@ elif mode == "ℹ️ Tentang":
     - Klasifikasi: 4 kelas
     - Input: Gambar via upload/kamera
 
-    ### 📊 Dataset
-    - ±4000 gambar dilatih
-    - Augmentasi: rotasi, flip, brightness
-    - Akurasi validasi: ±91%
-
     ### 👨‍💻 Pengembang
     Proyek oleh:
     **Kelompok 19 - D3 Teknologi Informasi**
